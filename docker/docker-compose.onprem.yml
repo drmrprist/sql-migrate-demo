@@ -1,0 +1,47 @@
+version: '3.8'
+
+services:
+  sqlserver-source:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    platform: linux/amd64
+    container_name: sqlserver-source
+    environment:
+      - ACCEPT_EULA=Y
+      - MSSQL_SA_PASSWORD=SourceDB@12345
+    ports:
+      - "1433:1433"
+    volumes:
+      - sqlserver-data:/var/opt/mssql
+    healthcheck:
+      test: ["CMD", "/opt/mssql-tools18/bin/sqlcmd", "-S", "localhost", "-U", "sa", "-P", "SourceDB@12345", "-C", "-Q", "SELECT 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  eshop-web:
+    build:
+      context: ../apps/dotnet-eshop/src
+      dockerfile: ../../docker/Dockerfile.eshop
+    container_name: eshop-web
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__CatalogConnection=Server=sqlserver-source,1433;Database=Microsoft.eShopOnWeb.CatalogDb;User Id=sa;Password=SourceDB@12345;TrustServerCertificate=True;
+      - ConnectionStrings__IdentityConnection=Server=sqlserver-source,1433;Database=Microsoft.eShopOnWeb.Identity;User Id=sa;Password=SourceDB@12345;TrustServerCertificate=True;
+    ports:
+      - "8080:8080"
+    depends_on:
+      sqlserver-source:
+        condition: service_healthy
+
+  nginx:
+    image: nginx:alpine
+    container_name: nginx-ingress
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - eshop-web
+
+volumes:
+  sqlserver-data:
