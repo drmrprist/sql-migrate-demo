@@ -1,0 +1,9 @@
+{
+  "serverName": "10.0.1.5",
+  "port": 1433,
+  "userName": "sa",
+  "password": "SourceDB@12345!",
+  "authentication": "SqlAuthentication",
+  "encryptConnection": true,
+  "trustServerCertificate": true
+}

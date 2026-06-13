@@ -1,0 +1,9 @@
+{
+  "serverName": "eshop-sqlserver-1781294732.database.windows.net",
+  "port": 1433,
+  "userName": "sqladmin",
+  "password": "AzureDB@12345!",
+  "authentication": "SqlAuthentication",
+  "encryptConnection": true,
+  "trustServerCertificate": false
+}
