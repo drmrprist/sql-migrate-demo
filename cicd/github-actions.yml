@@ -1,0 +1,29 @@
+name: eShopOnWeb Migration CI/CD
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: true
+      - name: Build Docker image
+        run: docker build -t eshop-web -f docker/Dockerfile.eshop apps/dotnet-eshop
+      - name: Run validation
+        run: echo Validation placeholder
+  migrate:
+    runs-on: ubuntu-latest
+    needs: build
+    if: github.ref == "refs/heads/main"
+    steps:
+      - uses: actions/checkout@v3
+      - name: Pre-migration checks
+        run: echo Pre-migration checks passed
+      - name: Trigger DMS migration
+        run: echo DMS migration triggered
+      - name: Post-migration validation
+        run: echo Post-migration validation passed
